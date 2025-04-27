@@ -1,20 +1,22 @@
 "use client"
 
-import type React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 
-/** Login page always forces light theme so it ignores global dark‑mode setting. */
+/** Login page always forces light theme so it ignores global dark-mode setting. */
 export default function LoginPage() {
   const { setTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Role state: "admin" or "user"
+  const [role, setRole] = useState<"admin" | "user">("admin");
   const router = useRouter();
 
   // Force light mode once when component mounts
@@ -25,7 +27,8 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: replace with real auth flow
-    router.push("/"); // -> dashboard
+    const destination = role === "user" ? "/users" : "/";
+    router.push(destination);
   };
 
   return (
@@ -35,7 +38,13 @@ export default function LoginPage() {
           {/* Left side - Info panel */}
           <div className="bg-[#002244] p-8 text-white flex flex-col items-center justify-center">
             <div className="flex flex-col items-center space-y-6 max-w-md">
-              <Image src="/seal.png" alt="RERS Seal" width={120} height={120} className="h-30 w-30" />
+              <Image
+                src="/seal.png"
+                alt="RERS Seal"
+                width={120}
+                height={120}
+                className="h-30 w-30"
+              />
               <div className="text-center space-y-2">
                 <h1 className="text-2xl font-bold">Rapid Emergency Response System</h1>
                 <p className="text-[#a3c2e0]">Authorized Personnel Only</p>
@@ -53,7 +62,9 @@ export default function LoginPage() {
             <div className="w-full max-w-md space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-white">Sign In</h2>
-                <p className="text-sm text-[#a3c2e0] mt-1">Enter your credentials to access the system</p>
+                <p className="text-sm text-[#a3c2e0] mt-1">
+                  Enter your credentials to access the system
+                </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -93,10 +104,14 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <Link href="#" className="text-sm font-medium text-[#a3c2e0] hover:text-white">
-                    Forgot password?
-                  </Link>
+                {/* Role Toggle */}
+                <div className="flex items-center space-x-4 pt-4">
+                  <span className="text-sm font-medium text-white">Admin</span>
+                  <Switch
+                    checked={role === "user"}
+                    onCheckedChange={(checked) => setRole(checked ? "user" : "admin")}
+                  />
+                  <span className="text-sm font-medium text-white">User</span>
                 </div>
 
                 <Button type="submit" className="w-full bg-[#002244] hover:bg-[#001a33] text-white">
